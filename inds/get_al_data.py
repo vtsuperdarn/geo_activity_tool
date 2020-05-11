@@ -3,8 +3,11 @@ import os
 from kyoto_utils import create_url_form, iaga_format_to_df
 import pandas
 import numpy
+import sys
+sys.path.append("../")
+import db_utils
 
-class ExtractAL(object):
+class DownloadAL(object):
     """
     A utils class to download and extract AL
     from real time plot!
@@ -50,9 +53,32 @@ class ExtractAL(object):
                                     [start_date,end_date]
                                 )
                 start_date  = end_date
-        # some constants for cheat mode data
-        self.al_zero_loc = -57.5
-        self.al_scale = 17.
+        
+    def fetch_store_aur_data(self, db_name="gme_data",\
+                        table_name="aur_inds",\
+                        local_data_store="../data/sqlite3/"):
+        """
+        Download AUR inds data and store in a db
+        """
+        from db_utils import DbUtils
+        from aul_from_images import ExtractAL
+        # fetch the data
+        data_df, missing_dates = self.get_al_data()
+        # set up the database connections!
+        db_obj = DbUtils(db_name=db_name,\
+                     local_data_store=local_data_store)
+        if data_df is not None:
+            print("Working with data wdc provides!")
+            db_obj.aur_inds_to_db(data_df, table_name=table_name)
+            print("Updated DB!")
+        # Now we'll work on the missing dates
+        if len(missing_dates) > 0:
+            print("Working with missing dates! cheat mode on")
+            data_obj = ExtractAL(missing_dates)
+            aur_img_data_df = data_obj.get_al_data()
+            db_obj.aur_inds_to_db(aur_img_data_df, table_name=table_name)
+            print("Updated DB!")
+        
 
     def get_al_data(self, convert_aul_to_int=True):
         """
@@ -65,7 +91,12 @@ class ExtractAL(object):
             resp = create_url_form(_dt, self.aul_base_url)
             raw_data = resp.readlines()
             _df = iaga_format_to_df(raw_data)
+            bad_date_list = []
             if _df is not None:
+                # remove unwanted values!
+                bad_val_dates = _df[_df["al"] <= -10000.]["date"].dt.date.unique()
+                if bad_val_dates.shape[0] > 0:
+                    bad_date_list = list(bad_val_dates)
                 # we have several columns as float64's by default!
                 # convert them into int16's
                 if convert_aul_to_int:
@@ -73,6 +104,7 @@ class ExtractAL(object):
                     _df["al"] = _df['al'].astype(numpy.int16)
                     _df["ao"] = _df['ao'].astype(numpy.int16)
                     _df["au"] = _df['au'].astype(numpy.int16)
+                    _df["cheat_flag"] = 0
                 aul_df_list.append(_df)
         # merge all the data into a larger DF
         if len(aul_df_list) > 0:
@@ -84,23 +116,35 @@ class ExtractAL(object):
             diff_hours = ( self.date_range_list[-1][-1] - last_download_date ).total_seconds()/3600.
             # NOTE if the difference is greater than 24 hours!
             if diff_hours <= 24:
-                return aul_df, []
+                return aul_df, [] + bad_date_list
             else:
-                return aul_df, [ last_download_date, self.date_range_list[-1][-1] ]
+                num_days = (self.date_range_list[-1][-1] - last_download_date).days
+                date_list = [\
+                            self.date_range_list[0][0] +\
+                             datetime.timedelta(days=x) for x in range(num_days)\
+                            ]
+                return aul_df, date_list + bad_date_list
 
         else:
             print("No data found")
-            return None, [ self.date_range_list[0][0], self.date_range_list[-1][-1] ]
+            num_days = (self.date_range_list[-1][-1] - self.date_range_list[0][0]).days
+            date_list = [\
+                        self.date_range_list[0][0] +\
+                         datetime.timedelta(days=x) for x in range(num_days)\
+                        ]
+            return None, date_list + bad_date_list
 
 
 if __name__ == "__main__":
-    data_obj = ExtractAL(
+    data_obj = DownloadAL(
                     date_range = [ 
-                                datetime.datetime(2015,1,1),
-                                datetime.datetime(2015,1,3),
+                                datetime.datetime(2018,1,1),
+                                datetime.datetime(2018,2,28),
                                ]
                         )
-    data_df, missing_dates = data_obj.get_al_data()
-    print(data_df.head())
-    print("----------------")
-    print(missing_dates)
+#     data_df, missing_dates = data_obj.get_al_data()
+#     if data_df is not None:
+#         print(data_df.tail())
+#     print("----------------")
+#     print(missing_dates)
+    data_obj.fetch_store_aur_data()

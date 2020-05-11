@@ -5,6 +5,8 @@ def create_url_form(date_range,base_url,\
                  email='test@gmail.com', output="AE"):
     """
     create url based on a date range
+    
+    Written By - Bharat Kunduri (04/2020)
     """
     import urllib.parse, urllib.request
 

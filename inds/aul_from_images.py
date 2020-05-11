@@ -5,6 +5,8 @@ class ExtractAL(object):
     """
     A utils class to download and extract AL
     from real time plot!
+    
+    Written By - Bharat Kunduri (05/2020)
     """
     def __init__(self, download_date_list, local_dir="../data/"):
         """
@@ -224,8 +226,14 @@ class ExtractAL(object):
         max_al_val = -1*data_df["al"].max()
         data_df["al"] = (data_df["al"] - data_df["al"].max()) * (3000./al_scale)
         data_df["au"] = ( max_al_val - data_df["au"] ) * (3000./al_scale)
+        data_df["ao"] = (data_df["au"] + data_df["al"])/2.
+        data_df["ae"] = data_df["au"] - data_df["al"]
+        # convert to ints
         data_df["al"] = data_df["al"].astype(numpy.int16)
         data_df["au"] = data_df["au"].astype(numpy.int16)
+        data_df["ao"] = data_df["ao"].astype(numpy.int16)
+        data_df["ae"] = data_df["ae"].astype(numpy.int16)
+        data_df["cheat_flag"] = 1
         return data_df
     
     def rgb2hex(self,rgb_arr):
