@@ -71,6 +71,41 @@ class DbUtils(object):
         # close db connection
         self.conn.close()
         
+    def kp_to_db(self, kp_df, table_name="kp"):
+        """
+        Write the dataframe with kp data into the db.
+        Parameters
+        ----------
+        kp_df : pandas dataframe with aur data
+        """
+
+        # create table if it doesn't exist
+        sql_create_projects_table = """ 
+                                        CREATE TABLE IF NOT EXISTS {tb} (
+                                        date TIMESTAMP PRIMARY KEY,
+                                        kp REAL NOT NULL,
+                                        bin_start_date TIMESTAMP,
+                                        bin_end_date TIMESTAMP
+                                    ); 
+                                    """
+        command = sql_create_projects_table.format(tb=table_name)
+        if self.conn is not None:
+            self.conn.cursor().execute(command)
+        else:
+            print("Error! cannot create the db connection!")
+        # populate the table
+        cols = "date, kp, bin_start_date, bin_end_date"
+        for _nrow, _row in kp_df.iterrows():
+            command = "INSERT OR REPLACE INTO {tb}({cols}) VALUES (?, ?, ?, ?)".\
+                      format(tb=table_name, cols=cols)
+            self.conn.cursor().execute(\
+                        command,\
+                         (_row["date"].to_pydatetime(), _row["kp"], _row["bin_start_date"].to_pydatetime(), _row["bin_end_date"].to_pydatetime())\
+                         )
+        self.conn.commit()
+        # close db connection
+        self.conn.close()
+        
     def aur_inds_to_db(self, au_df, table_name="aur_inds"):
         """
         Write the dataframe with aur data into the db.

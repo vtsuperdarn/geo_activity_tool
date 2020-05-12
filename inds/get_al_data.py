@@ -119,7 +119,7 @@ class DownloadAL(object):
             else:
                 num_days = (self.date_range_list[-1][-1] - last_download_date).days
                 date_list = [\
-                            self.date_range_list[0][0] +\
+                            last_download_date +\
                              datetime.timedelta(days=x) for x in range(num_days)\
                             ]
                 return aul_df, date_list + bad_date_list

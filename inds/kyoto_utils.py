@@ -41,6 +41,63 @@ def create_url_form(date_range,base_url,\
     data+='IAGA2002&Email={0[Email]}'.format(url_data)
     return urllib.request.urlopen(base_url+'?'+data) 
 
+def set_kp_url(date_range, email='test@gmail.com'):
+    """
+    create url for Kp based on a date range
+    
+    Written By - Bharat Kunduri (05/2020)
+    """
+    import urllib.parse, urllib.request
+
+    # Kp is downloaded in months! So get the relevant dates
+    # get the year/month from dates
+    if type(date_range) == list:
+        start_date = date_range[0]
+        end_date = date_range[1]
+    elif type(date_range) == datetime.datetime:
+        start_date = date_range
+        end_date = date_range
+    else:
+        print("wrong inputs, need a list of datetime or one datetime obj!")
+        return None
+    year_start = start_date.year
+    year_end = end_date.year
+    month_start = start_date.month
+    month_end = end_date.month
+    # Setup the url data
+    url_data = {} 
+    if year_start >= 2000:
+        url_data['SCent'] = 20
+    else:
+        url_data['SCent'] = 19
+    url_data['STens'] = int(('%d'%year_start)[2])
+    url_data['SYear'] = int(('%d'%year_start)[3])
+    url_data['SMonth'] = '%02i' % month_start
+    # End Time:
+    if year_end >= 2000:
+        url_data['ECent'] = 20
+    else:
+        url_data['ECent'] = 19
+    url_data['ETens'] = int(('%d'%year_end)[2])
+    url_data['EYear'] = int(('%d'%year_end)[3])
+    url_data['EMonth'] = '%02i' % month_end
+
+    # wrap up the url
+    email = urllib.parse.quote(email)
+    data=urllib.parse.urlencode(url_data)
+    base_url='http://wdc.kugi.kyoto-u.ac.jp/cgi-bin/kp-cgi'#
+    data='%s=%2i&%s=%i&%s=%i&%s=%s&%s=%2i&%s=%i&%s=%i&%s=%s&%s=%s' % \
+        ('SCent', url_data['SCent'], \
+         'STens', url_data['STens'], \
+         'SYear', url_data['SYear'], \
+         'SMonth',url_data['SMonth'],\
+         'ECent', url_data['ECent'], \
+         'ETens', url_data['ETens'], \
+         'EYear', url_data['EYear'], \
+         'EMonth',url_data['EMonth'],\
+         'Email' ,email)
+    return urllib.request.urlopen(base_url, data.encode())
+
 def iaga_format_to_df(input_data, num_head=12):
     """
     READ WDC Kyoto's IADA format and convert to
@@ -81,3 +138,51 @@ def iaga_format_to_df(input_data, num_head=12):
     # convert to DF!
     data_df = pandas.DataFrame.from_dict(out_data_dict)
     return data_df
+
+def kp_to_df(input_data):
+    """
+    raw Kp data to DF
+    """
+    import numpy
+
+    # In Python3 data is returned in bytes!
+    if type(input_data[0])==bytes:
+        for i in range(len(input_data)):
+            input_data[i] = input_data[i].decode()
+    
+    # Discard the header
+    if input_data[0][1:5]=='HTML':
+        input_data.pop(0);input_data.pop(0);input_data.pop(-1)
+    if input_data[0][0:4]=='YYYY':
+        input_data.pop(0)
+
+    data_len = len(input_data)
+    date = numpy.zeros(8*data_len, dtype=object)
+    bin_start_date = numpy.zeros(8*data_len, dtype=object)
+    bin_end_date = numpy.zeros(8*data_len, dtype=object)
+    kp   = numpy.zeros(8*data_len)
+    hr1  = [0,3,6,9,12,15,18,21,0]
+    hrs  = [1,4,7,10,13,16,19,22]
+    frac_to_dec_dict = {' ':0.0, '-':-1./3., '+':1./3.}
+    # Parse input_data.
+    for i,line in enumerate(input_data):
+        yy = int(line[0:4])
+        mm = int(line[4:6])
+        dd = int(line[6:8])
+        for j in range(8):
+            kp[8*i+j]  = float(line[9+2*j])+frac_to_dec_dict[line[10+2*j]]
+            date[8*i+j]= datetime.datetime(yy,mm,dd,hrs[j],30,0)
+            bin_start_date[8*i+j]= datetime.datetime(yy,mm,dd,hr1[j],0,0)
+            # its a 3 hour index!
+            bin_end_date[8*i+j]= bin_start_date[8*i+j]+datetime.timedelta(hours=3)
+    # convert to a dataframe
+    if date.shape[0] > 0:
+        return pandas.DataFrame(\
+                            {
+                             'date': date,\
+                             'kp': kp,
+                             'bin_start_date': bin_start_date,
+                             'bin_end_date': bin_end_date,
+                            }\
+                        )
+    return None

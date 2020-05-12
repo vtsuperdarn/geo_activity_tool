@@ -65,7 +65,7 @@ class DownloadAsym(object):
             print("Updated DB!")
         
 
-    def get_asym_data(self, convert_aul_to_int=True):
+    def get_asym_data(self, convert_asy_to_int=True):
         """
         download Asym/Sym data
         """
@@ -84,7 +84,7 @@ class DownloadAsym(object):
                     bad_date_list = list(bad_val_dates)
                 # we have several columns as float64's by default!
                 # convert them into int16's
-                if convert_aul_to_int:
+                if convert_asy_to_int:
                     _df["asy-d"] = _df['asy-d'].astype(numpy.int16)
                     _df["asy-h"] = _df['asy-h'].astype(numpy.int16)
                     _df["sym-d"] = _df['sym-d'].astype(numpy.int16)
@@ -104,7 +104,7 @@ class DownloadAsym(object):
             else:
                 num_days = (self.date_range_list[-1][-1] - last_download_date).days
                 date_list = [\
-                            self.date_range_list[0][0] +\
+                            last_download_date +\
                              datetime.timedelta(days=x) for x in range(num_days)\
                             ]
                 return asym_df, date_list + bad_date_list
