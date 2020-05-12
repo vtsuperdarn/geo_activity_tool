@@ -37,7 +37,7 @@ def create_url_form(date_range,base_url,\
     data+='Dur_Day={0[Dur_Day]:d}&Dur_Hour={0[Dur_Hour]:02d}&'.format(url_data)
     data+='Dur_Min={0[Dur_Min]:02d}&Image+Type=GIF&COLOR='.format(url_data)
     data+='COLOR&AE+Sensitivity=0&ASY%2FSYM++Sensitivity=0&'
-    data+='Output=AE&Out+format='.format(url_data)
+    data+='Output={0[Output]}&Out+format='.format(url_data)
     data+='IAGA2002&Email={0[Email]}'.format(url_data)
     return urllib.request.urlopen(base_url+'?'+data) 
 

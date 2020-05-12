@@ -20,7 +20,6 @@ class DbUtils(object):
             Name of the sqlite db to which data will be written
         local_data_store : str
             Path to db_name file
-        
         """
         self.db_name = db_name
         self.local_data_store = local_data_store
@@ -35,7 +34,43 @@ class DbUtils(object):
         conn = sqlite3.connect(self.local_data_store + self.db_name,
                                detect_types = sqlite3.PARSE_DECLTYPES)
         return conn
+    
+    def sym_inds_to_db(self, asym_df, table_name="sym_inds"):
+        """
+        Write the dataframe with aur data into the db.
+        Parameters
+        ----------
+        asym_df : pandas dataframe with sym/asym inds data
+        """
 
+        # create table if it doesn't exist
+        sql_create_projects_table = """ 
+                                        CREATE TABLE IF NOT EXISTS {tb} (
+                                        date TIMESTAMP PRIMARY KEY,
+                                        asyd integer NOT NULL,
+                                        asyh integer,
+                                        symd integer,
+                                        symh integer
+                                    ); 
+                                    """
+        command = sql_create_projects_table.format(tb=table_name)
+        if self.conn is not None:
+            self.conn.cursor().execute(command)
+        else:
+            print("Error! cannot create the db connection!")
+        # populate the table
+        cols = "date, asyd, asyh, symd, symh"
+        for _nrow, _row in asym_df.iterrows():
+            command = "INSERT OR REPLACE INTO {tb}({cols}) VALUES (?, ?, ?, ?, ?)".\
+                      format(tb=table_name, cols=cols)
+            self.conn.cursor().execute(\
+                        command,\
+                         (_row["date"].to_pydatetime(), _row["asy-d"], _row["asy-h"], _row["sym-d"], _row["sym-h"])\
+                         )
+        self.conn.commit()
+        # close db connection
+        self.conn.close()
+        
     def aur_inds_to_db(self, au_df, table_name="aur_inds"):
         """
         Write the dataframe with aur data into the db.
