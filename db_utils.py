@@ -1,3 +1,4 @@
+import numpy
 import pandas
 import datetime
 import sqlite3
@@ -8,6 +9,7 @@ class DbUtils(object):
     A utils class for working with SQLITE3 db
 
     Written By - Bharat Kunduri (05/2020)
+    MOdified By - Shibaji Chakraborty (05/2020)
     """
     def __init__(self, db_name="gme_data",\
                  local_data_store="data/sqlite3/"):
@@ -31,9 +33,53 @@ class DbUtils(object):
         """
 
         # make a db connection
-        conn = sqlite3.connect(self.local_data_store + self.db_name,
-                               detect_types = sqlite3.PARSE_DECLTYPES)
+        conn = sqlite3.connect(self.local_data_store + self.db_name, detect_types = sqlite3.PARSE_DECLTYPES)
         return conn
+
+    def _commit_tx(self):
+        """
+        Commit last transaction
+        """
+        self.conn.commit()
+        return
+
+    def _close_dbconn(self):
+        """
+        Close database connection
+        """
+        self.conn.close()
+        return
+
+    def omni_to_db(self, omni_df, table_name="omni", chunksize=3600, if_exists="replace"):
+        """
+        Write the dataframe with OMNI data into the db.
+        Parameters
+        ----------
+        omni_df : pandas dataframe with solar wind data
+        `"""
+        sql_create_omni_table = """
+                                    CREATE TABLE IF NOT EXISTS {tb} (
+                                    date TIMESTAMP PRIMARY KEY,
+                                    bx float,
+                                    by float,
+                                    bz float,
+                                    b float,
+                                    vx float,
+                                    vy float,
+                                    vz float,
+                                    v float,
+                                    n float,
+                                    t float
+                                    );
+                                """
+        command = sql_create_omni_table.format(tb=table_name)
+        if self.conn is not None:
+            self.conn.cursor().execute(command)
+        else:
+            print("Error! cannot create the db connection!")
+        omni_df.to_sql(table_name, con=self.conn, if_exists=if_exists, chunksize=chunksize)
+        self._commit_tx()
+        return
     
     def sym_inds_to_db(self, asym_df, table_name="sym_inds"):
         """
