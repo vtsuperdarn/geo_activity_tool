@@ -87,6 +87,7 @@ class DownloadOmni(object):
             os.system(uri)
             _df = pandas.concat([_df, self._to_pandas(tmp)])
             os.system("rm /tmp/omni_min{year}.asc".format(year = yr))
+        _df = _df.set_index("date")
         return _df
 
 
@@ -94,7 +95,7 @@ if __name__ == "__main__":
     dob = DownloadOmni(
             date_range = [
                 datetime.datetime(2016,1,1),
-                datetime.datetime(2017,1,1),
+                datetime.datetime(2016,1,1),
                 ]
             )
     dob.fetch_omni_data()
