@@ -50,6 +50,31 @@ class DbUtils(object):
         self.conn.close()
         return
 
+    def map_to_db(self, map_df, table_name="sd_map", chunksize=3600, if_exists="replace"):
+        """
+        Write the dataframe with SuperDARN map data into the db.
+        Parameters
+        ----------
+        map_df : pandas dataframe with SuperDAN map data
+        `"""
+        sql_create_map_table = """
+                                    CREATE TABLE IF NOT EXISTS {tb} (
+                                    date TIMESTAMP PRIMARY KEY,
+                                    highlat_nvec integer,
+                                    midlat_nvec integer,
+                                    hm_bnd float,
+                                    cpcp float
+                                    );
+                                """
+        command = sql_create_map_table.format(tb=table_name)
+        if self.conn is not None:
+            self.conn.cursor().execute(command)
+        else:
+            print("Error! cannot create the db connection!")
+        map_df.to_sql(table_name, con=self.conn, if_exists=if_exists, chunksize=chunksize)
+        self._commit_tx()
+        return
+    
     def omni_to_db(self, omni_df, table_name="omni", chunksize=3600, if_exists="replace"):
         """
         Write the dataframe with OMNI data into the db.
