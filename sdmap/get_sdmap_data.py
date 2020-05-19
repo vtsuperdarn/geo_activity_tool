@@ -30,7 +30,7 @@ class DownloadSDMap(object):
         self.hemi = hemi
         
     def store_map_data(self, db_name="gme_data",\
-                        table_name="sdmap",\
+                        table_name="sd_map",\
                         local_data_store="../data/sqlite3/"):
         """
         Download AUR inds data and store in a db
@@ -45,6 +45,8 @@ class DownloadSDMap(object):
             print("Working with map data from VT server!")
             db_obj.map_to_db(data_df, table_name=table_name)
             print("Updated DB!")
+        db_obj._close_dbconn()
+        return
         
 
     def fetch_map_data(self):
