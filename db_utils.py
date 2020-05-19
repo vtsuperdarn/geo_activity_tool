@@ -213,3 +213,12 @@ class DbUtils(object):
         self.conn.commit()
         # close db connection
         self.conn.close()
+
+
+    def fetch_table_by_sql(self, sql, coerce_float=True, parse_dates=["date"]):
+        """
+        Fetch data from database table using query
+        """
+        df = pandas.read_sql(sql, self.conn, coerce_float=coerce_float, parse_dates=parse_dates)
+        self._close_dbconn()
+        return df
