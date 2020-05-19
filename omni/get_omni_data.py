@@ -68,7 +68,7 @@ class DownloadOmni(object):
         _o = _o[["date", "bx", "by_gse", "bz_gse", "b_rms", "v", "vx_gse", "vy_gse", "vz_gse", "n", "t"]]
         _o = _o.rename(columns={"vx_gse": "vx", "vy_gse": "vy", "vz_gse": "vz", "by_gse": "by", "bz_gse": "bz", "b_rms": "b"})
         _o = _o.astype({"bx": "float16", "by": "float16", "bz": "float16", "b": "float16", "v": "float16",
-            "vx": "float16", "vy": "float16", "vz": "float16", "n": "float16", "t": "float16"})
+            "vx": "float16", "vy": "float16", "vz": "float16", "n": "float16", "t": "float32"})
         return _o
 
     def _download_omni(self):
@@ -91,12 +91,38 @@ class DownloadOmni(object):
         return _df
 
 
+def fetch_omni_by_dates(sdate, edate, db_name="omni_data",\
+        table_name="omni", local_data_store="../data/sqlite3/"):
+    """
+    Get the stored OMNI data from omni database
+    Parameters
+    ----------
+    sdate : start datetime
+    edate : end datetime
+    db_name : name of the database
+    table_name : table name
+    local_data_store : folder location of the files
+    """
+    from db_utils import DbUtils
+    dbo = DbUtils(db_name=db_name, local_data_store=local_data_store)
+    sql = """SELECT * from {tb} WHERE strftime('%s', date) BETWEEN strftime('%s', '{sdate}') AND strftime('%s', '{edate}')\
+            """.format(tb=table_name,sdate=sdate,edate=edate)
+    print("Running sql query >> ",sql)
+    df = dbo.fetch_table_by_sql(sql)
+    nan_directory = {"bx":10000.0, "by":10000.0, "bz":10000.0, "b":10000.0, "v":99999.9,
+            "vx":99999.9, "vy":99999.9, "vz":99999.9, "n":1000.0, "t":9999999.}
+    for _kv in nan_directory.keys():
+        df = df.replace(nan_directory[_kv], numpy.inf)
+    print(df.head())
+    return df
+
 if __name__ == "__main__":
-    dob = DownloadOmni(
+    domni = DownloadOmni(
             date_range = [
-                datetime.datetime(2016,1,1),
-                datetime.datetime(2016,1,1),
+                datetime.datetime(2017,1,1),
+                datetime.datetime(2018,1,1),
                 ]
             )
-    dob.fetch_omni_data()
-
+    domni.fetch_omni_data()
+    fetch_omni_by_dates(datetime.datetime(2017,1,31), datetime.datetime(2017,2,2))
+    #os.system("rm ../data/sqlite3/*")
