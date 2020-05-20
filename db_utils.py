@@ -10,6 +10,7 @@ class DbUtils(object):
 
     Written By - Bharat Kunduri (05/2020)
     MOdified By - Shibaji Chakraborty (05/2020)
+    MOdified By - Xueling Shi (05/2020)
     """
     def __init__(self, db_name="gme_data",\
                  local_data_store="data/sqlite3/"):
