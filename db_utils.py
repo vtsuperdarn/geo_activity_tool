@@ -57,7 +57,7 @@ class DbUtils(object):
         Parameters
         ----------
         map_df : pandas dataframe with SuperDAN map data
-        `"""
+        """
         sql_create_map_table = """
                                     CREATE TABLE IF NOT EXISTS {tb} (
                                     date TIMESTAMP PRIMARY KEY,
@@ -75,6 +75,40 @@ class DbUtils(object):
         map_df.to_sql(table_name, con=self.conn, if_exists=if_exists, chunksize=chunksize)
         self._commit_tx()
         return
+
+    def dscovr_to_db(self, dscovr_df, table_name="dscovr", chunksize=3600, if_exists="replace"):
+        """
+        Write the dataframe with OMNI data into the db.
+        Parameters
+        ----------
+        dscovr_df : pandas dataframe with solar wind data
+        table_name : Name of the table
+        chunksize : commit chuncksize
+        if_exists : if exists data what to do
+        """
+        sql_create_omni_table = """
+                                    CREATE TABLE IF NOT EXISTS {tb} (
+                                        date TIMESTAMP PRIMARY KEY,
+                                        bx float,
+                                        by float,
+                                        bz float,
+                                        by_gse float,
+                                        bz_gse float,
+                                        vx float,
+                                        vy float,
+                                        vz float,
+                                        n float,
+                                        t float
+                                        );
+                                """
+        command = sql_create_omni_table.format(tb=table_name)
+        if self.conn is not None:
+            self.conn.cursor().execute(command)
+        else:
+            print("Error! cannot create the db connection!")
+        dscovr_df.to_sql(table_name, con=self.conn, if_exists=if_exists, chunksize=chunksize)
+        self._commit_tx()
+        return
     
     def omni_to_db(self, omni_df, table_name="omni", chunksize=3600, if_exists="replace"):
         """
@@ -82,18 +116,21 @@ class DbUtils(object):
         Parameters
         ----------
         omni_df : pandas dataframe with solar wind data
-        `"""
+        table_name : Name of the table
+        chunksize : commit chuncksize
+        if_exists : if exists data what to do
+        """
         sql_create_omni_table = """
                                     CREATE TABLE IF NOT EXISTS {tb} (
                                     date TIMESTAMP PRIMARY KEY,
                                     bx float,
                                     by float,
                                     bz float,
-                                    b float,
+                                    by_gse float,
+                                    bz_gse float,
                                     vx float,
                                     vy float,
                                     vz float,
-                                    v float,
                                     n float,
                                     t float
                                     );

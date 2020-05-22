@@ -26,7 +26,7 @@ class DownloadOmni(object):
         self.date_range = date_range
         return
 
-    def fetch_omni_data(self, db_name="omni_data",\
+    def fetch_omni_data(self, db_name="gme_data",\
             table_name="omni",\
             local_data_store="../data/sqlite3/"):
         """
@@ -65,9 +65,9 @@ class DownloadOmni(object):
                 float(values[37]),float(values[38]),float(values[39]),float(values[40]),float(values[41]),float(values[42]),float(values[43]),
                 float(values[44]),float(values[45])])
         _o = pandas.DataFrame(linevalues, columns=header)
-        _o = _o[["date", "bx", "by_gse", "bz_gse", "b_rms", "v", "vx_gse", "vy_gse", "vz_gse", "n", "t"]]
-        _o = _o.rename(columns={"vx_gse": "vx", "vy_gse": "vy", "vz_gse": "vz", "by_gse": "by", "bz_gse": "bz", "b_rms": "b"})
-        _o = _o.astype({"bx": "float16", "by": "float16", "bz": "float16", "b": "float16", "v": "float16",
+        _o = _o[["date", "bx", "by_gse", "bz_gse", "by_gsm", "bz_gsm", "vx_gse", "vy_gse", "vz_gse", "n", "t"]]
+        _o = _o.rename(columns={"vx_gse": "vx", "vy_gse": "vy", "vz_gse": "vz", "by_gsm": "by", "bz_gsm": "bz"})
+        _o = _o.astype({"bx": "float16", "by": "float16", "bz": "float16", "by_gse": "float16", "bz_gse": "float16", 
             "vx": "float16", "vy": "float16", "vz": "float16", "n": "float16", "t": "float32"})
         return _o
 
@@ -87,12 +87,13 @@ class DownloadOmni(object):
             os.system(uri)
             _df = pandas.concat([_df, self._to_pandas(tmp)])
             os.system("rm /tmp/omni_min{year}.asc".format(year = yr))
+        _df = _df[(_df.date >= self.date_range[0]) & (_df.date < self.date_range[1])]
         _df = _df.set_index("date")
         return _df
 
 
-def fetch_omni_by_dates(sdate, edate, db_name="omni_data",\
-        table_name="omni", local_data_store="../data/sqlite3/"):
+def fetch_omni_by_dates(sdate, edate, db_name="gme_data",\
+        table_name="omni", local_data_store="../data/sqlite3/", imf_coord="gsm"):
     """
     Get the stored OMNI data from omni database
     Parameters
@@ -102,27 +103,31 @@ def fetch_omni_by_dates(sdate, edate, db_name="omni_data",\
     db_name : name of the database
     table_name : table name
     local_data_store : folder location of the files
+    imf_coord : Coordinate of the IMF data "gsm", "gse"
     """
     from db_utils import DbUtils
     dbo = DbUtils(db_name=db_name, local_data_store=local_data_store)
-    sql = """SELECT * from {tb} WHERE strftime('%s', date) BETWEEN strftime('%s', '{sdate}') AND strftime('%s', '{edate}')\
-            """.format(tb=table_name,sdate=sdate,edate=edate)
+    sql = """SELECT * from {tb} WHERE strftime('%s', date) BETWEEN strftime('%s', '{sdate}') AND strftime('%s', '{edate}')""".format(tb=table_name,sdate=sdate,edate=edate)
     print("Running sql query >> ",sql)
     df = dbo.fetch_table_by_sql(sql)
-    nan_directory = {"bx":10000.0, "by":10000.0, "bz":10000.0, "b":10000.0, "v":99999.9,
-            "vx":99999.9, "vy":99999.9, "vz":99999.9, "n":1000.0, "t":9999999.}
+    nan_directory = {"bx":10000.0, "by":10000.0, "bz":10000.0, "by_gse":10000.0, "bz_gse":10000.0, 
+            "b":10000.0, "v":99999.9, "vx":99999.9, "vy":99999.9, "vz":99999.9, 
+            "n":1000.0, "t":9999999.}
     for _kv in nan_directory.keys():
         df = df.replace(nan_directory[_kv], numpy.inf)
-    print(df.head())
+    if imf_coord == "gsm": df = df.drop(columns=["by_gse","bz_gse"])
+    elif imf_coord == "gse": 
+        df = df.drop(columns=["by","bz"])
+        df = df.rename(columns={"by_gse":"by", "bz_gse":"bz"})
     return df
 
 if __name__ == "__main__":
     domni = DownloadOmni(
             date_range = [
                 datetime.datetime(2017,1,1),
-                datetime.datetime(2018,1,1),
+                datetime.datetime(2017,3,1),
                 ]
             )
     domni.fetch_omni_data()
     fetch_omni_by_dates(datetime.datetime(2017,1,31), datetime.datetime(2017,2,2))
-    #os.system("rm ../data/sqlite3/*")
+    os.system("rm ../data/sqlite3/*")
