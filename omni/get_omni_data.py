@@ -124,10 +124,10 @@ def fetch_omni_by_dates(sdate, edate, db_name="gme_data",\
 if __name__ == "__main__":
     domni = DownloadOmni(
             date_range = [
-                datetime.datetime(2017,1,1),
-                datetime.datetime(2017,3,1),
+                datetime.datetime(2016,1,1),
+                datetime.datetime(2020,12,31),
                 ]
             )
     domni.fetch_omni_data()
-    fetch_omni_by_dates(datetime.datetime(2017,1,31), datetime.datetime(2017,2,2))
-    os.system("rm ../data/sqlite3/*")
+    #fetch_omni_by_dates(datetime.datetime(2017,1,31), datetime.datetime(2017,2,2))
+    #os.system("rm ../data/sqlite3/*")

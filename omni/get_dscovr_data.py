@@ -58,6 +58,7 @@ class DownloadDscovr(object):
             e = self.date_range[0] + datetime.timedelta(days=d)
             if month != e.month:
                 url = uri.format(year=e.year, month="%02d"%e.month)
+                print(url)
                 resp = requests.get(url)
                 if resp.status_code==200:
                     soup = BeautifulSoup(resp.text,"html.parser")
@@ -147,10 +148,10 @@ def fetch_dscovr_by_dates(sdate, edate, db_name="gme_data",\
 if __name__ == "__main__":
     dscovr = DownloadDscovr(
             date_range = [
-                datetime.datetime(2017,12,3),
-                datetime.datetime(2018,1,1),
+                datetime.datetime(2016,1,1),
+                datetime.datetime(2020,5,21),
                 ]
             )
     dscovr.fetch_dscovr_data()
-    fetch_dscovr_by_dates(datetime.datetime(2017,12,1), datetime.datetime(2017,12,4))
-    os.system("rm ../data/sqlite3/*")
+    #fetch_dscovr_by_dates(datetime.datetime(2017,12,1), datetime.datetime(2017,12,4))
+    #os.system("rm ../data/sqlite3/*")
