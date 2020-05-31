@@ -55,16 +55,16 @@ def ss_onset_page():
     tmp_plchldr_spin.image("misc/brewing2.gif")    
     
         
-def geo_activity_page(local_data_store="data/sqlite3/",\
+def geo_activity_page(local_data_store="./geo_tool/data/sqlite3/",\
                       plot_style="classic"):
     """
     Geo activity tool page
     """
     import sys
     sys.path.append("./geo_tool/")
-    from plotting import fetch_data_plotting
     from geo_tool_app import geo_activity_page
-    geo_activity_page()
+    geo_activity_page(local_data_store=local_data_store,\
+                      plot_style=plot_style)
     
 if __name__ == "__main__":
     main()
