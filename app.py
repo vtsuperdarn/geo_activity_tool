@@ -49,10 +49,10 @@ def ss_onset_page():
     """
     FAC model page
     """
-    tmp_plchldr_txt = st.empty()
-    tmp_plchldr_spin = st.empty()
-    tmp_plchldr_txt.subheader("Under development. Come back later...")
-    tmp_plchldr_spin.image("misc/brewing2.gif")    
+    import sys
+    sys.path.append("./sson_model/")
+    from sson_tool_app import fill_ssonset_preds
+    fill_ssonset_preds()
     
         
 def geo_activity_page(local_data_store="./geo_tool/data/sqlite3/",\
