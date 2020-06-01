@@ -55,11 +55,11 @@ def fill_ssonset_preds():
                               'IMF Values used for latest prediction'
                               )
                              )
+    state = session_state.get(hist_plot_date=omn_end_time)
     if ss_plot_option == 'IMF Values used for latest prediction':
         st.pyplot(imf_fig)
     else:
-        state = session_state.get(hist_plot_date = omn_end_time)
-        hist_fig = get_hist_sson_preds(state.hist_plot_date, curr_al_df)
+        hist_fig = get_hist_sson_preds(omn_end_time, curr_al_df)#state.hist_plot_date
         if hist_fig is not None:
             hist_plot = st.empty()
             hist_plot.pyplot(hist_fig)
@@ -105,8 +105,8 @@ def get_sson_preds(al_df):
      # get real time al index for estimates of 
     # current activity!
     al_df_2hour = al_df[\
-             (al_df["date"] >= omn_begin_time) &\
-             (al_df["date"] <= omn_end_time)\
+             (al_df["date"] >= str(omn_begin_time)) &\
+             (al_df["date"] <= str(omn_end_time))\
              ]
     # estimate current activity
     if al_df_2hour.shape[0] == 0:

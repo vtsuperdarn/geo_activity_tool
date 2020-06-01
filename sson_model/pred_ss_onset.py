@@ -1,7 +1,4 @@
 import keras
-# doint this to fix an issue with keras 2.3
-import keras.backend.tensorflow_backend as tb
-tb._SYMBOLIC_SCOPE.value = True
 import datetime   
 import json
 import pandas
@@ -179,7 +176,8 @@ class PredSSON(object):
         else:
             # The unit for bar width on a date x axis is days
             bar_width = del_time/(60.*24.)
-            hist_plot = ax.bar(date_arr,sson_prob_arr, width=bar_width,\
+            plt_date_arr = [x.to_pydatetime() for x in date_arr] 
+            hist_plot = ax.bar(plt_date_arr,sson_prob_arr, width=bar_width,\
                      alpha=0.7, align="edge",\
                      color=colors)
             # colorbar
@@ -444,7 +442,7 @@ class PredSSON(object):
         self.original_sw_imf_data.set_index('propagated_time_tag', inplace=True)
         # select the period of interest
         plot_df = self.original_sw_imf_data.loc[\
-             omn_begin_time : omn_end_time \
+             str(omn_begin_time) : str(omn_end_time) \
              ][omn_train_params]
         plot_df["datetime"] = plot_df.index
         # linearly interpolate data
