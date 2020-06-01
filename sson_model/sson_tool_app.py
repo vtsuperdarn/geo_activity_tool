@@ -1,5 +1,7 @@
 import altair as alt
 import streamlit as st
+import sys
+sys.path.append("../")
 import session_state
 import pandas
 import datetime
@@ -7,7 +9,7 @@ import sys
 import pred_ss_onset
 import extract_rt_al
 
-def fill_ssonset_preds():
+def fill_ssonset_preds(state):
     # work with some FAQs in the sidebar
 #     st.sidebar.markdown("# FAQs")
     st.sidebar.markdown("### What is a substorm?")
@@ -55,34 +57,33 @@ def fill_ssonset_preds():
                               'IMF Values used for latest prediction'
                               )
                              )
-    state = session_state.get(hist_plot_date=omn_end_time)
     if ss_plot_option == 'IMF Values used for latest prediction':
         st.pyplot(imf_fig)
     else:
-        hist_fig = get_hist_sson_preds(omn_end_time, curr_al_df)#state.hist_plot_date
+        hist_fig = get_hist_sson_preds(state.date_sson_hist_plot, curr_al_df)#
         if hist_fig is not None:
             hist_plot = st.empty()
             hist_plot.pyplot(hist_fig)
         else:
-            plot_date_err = state.hist_plot_date + datetime.timedelta(days=1)
+            plot_date_err = state.date_sson_hist_plot + datetime.timedelta(days=1)
             st.markdown("No data at this date, try a date > " +\
                         plot_date_err.strftime("%B %d, %Y") )
         if st.button("Prev day"):
-            state.hist_plot_date = state.hist_plot_date - datetime.timedelta(days=1)
-            hist_fig = get_hist_sson_preds(state.hist_plot_date, curr_al_df)
+            state.date_sson_hist_plot = state.date_sson_hist_plot - datetime.timedelta(days=1)
+            hist_fig = get_hist_sson_preds(state.date_sson_hist_plot, curr_al_df)
             if hist_fig is not None:
                 hist_plot.pyplot(hist_fig)
             else:
-                plot_date_err = state.hist_plot_date + datetime.timedelta(days=1)
+                plot_date_err = state.date_sson_hist_plot + datetime.timedelta(days=1)
                 st.markdown("No data at this date, try a date > " +\
                             plot_date_err.strftime("%B %d, %Y") )
         if st.button("Next day"):
-            state.hist_plot_date = state.hist_plot_date + datetime.timedelta(days=1)
-            hist_fig = get_hist_sson_preds(state.hist_plot_date, curr_al_df)
+            state.date_sson_hist_plot = state.date_sson_hist_plot + datetime.timedelta(days=1)
+            hist_fig = get_hist_sson_preds(state.date_sson_hist_plot, curr_al_df)
             if hist_fig is not None:
                 hist_plot.pyplot(hist_fig)
             else:
-                plot_date_err = state.hist_plot_date - datetime.timedelta(days=1)
+                plot_date_err = state.date_sson_hist_plot - datetime.timedelta(days=1)
                 st.markdown("No data at this date, try a date < " +\
                             plot_date_err.strftime("%B %d, %Y") )
         st.markdown("[Link to real time Auroral indices](http://wdc.kugi.kyoto-u.ac.jp/ae_realtime/today/today.html)")

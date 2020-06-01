@@ -1,9 +1,16 @@
 import datetime
 
-def geo_activity_page(local_data_store="./data/sqlite3/",\
+def geo_activity_page(
+                      state,
+                      local_data_store="./data/sqlite3/",\
                       plot_style="classic",\
                       inp_start_date=datetime.date(2018, 1, 2),\
-                      inp_start_time=datetime.time(0, 0)):
+                      inp_start_time=datetime.time(0, 0),\
+                      all_param_list = [ "DSCOVER", "OMNI", "STORM",\
+                                          "SUBSTORM", "SUPERDARN" ],\
+                      nhours_plot_default=0,\
+                      ndays_plot_default=1
+                     ):
     """
     Geo activity tool page
     """
@@ -16,18 +23,6 @@ def geo_activity_page(local_data_store="./data/sqlite3/",\
     
     # set the session state and get the parameters
     st.sidebar.markdown("### Plotting parameters")
-    all_param_list = [ "DSCOVER", "OMNI", "STORM",\
-                  "SUBSTORM", "SUPERDARN" ]
-    nhours_plot_default = 0
-    ndays_plot_default = 1
-    state = session_state.get(\
-                            plot_start_date=inp_start_date,\
-                            plot_start_time=inp_start_time,\
-                            plot_param_list=all_param_list,\
-                            plot_nhours_plot=nhours_plot_default,\
-                            plot_ndays_plot=ndays_plot_default
-                            )
-    
     # setup the input params!
     geo_plot = st.empty()
     params_multi_sel = st.sidebar.empty()
