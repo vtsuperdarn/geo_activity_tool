@@ -96,7 +96,9 @@ def fetch_data_plotting(sdate,edate,plot_style="classic",
     local_data_store : folder location of the files
     """
     import numpy
-    
+    import matplotlib.pyplot as plt
+    import matplotlib.dates as mdates
+        
     ax_per_dataset = [2,2,1,1,4] 
     nrows = numpy.sum(ax_per_dataset,where=flags)
     
@@ -267,11 +269,11 @@ def fetch_data_plotting(sdate,edate,plot_style="classic",
     if sdate.strftime("%m/%d/%Y") == edate.strftime("%m/%d/%Y"):
         axes[0].set_title(sdate.strftime("%m/%d/%Y"),fontsize=14)   
         if save_fig:
-            plt.savefig(sdate.strftime("%Y%m%d")+'_geotool_stack_plot.jpg')        
+            plt.savefig(sdate.strftime("%Y%m%d")+'_geotool_stack_plot.png')        
     else:
         axes[0].set_title(sdate.strftime("%m/%d/%Y")+'-'+edate.strftime("%m/%d/%Y"),fontsize=14)
         if save_fig:
-            plt.savefig(sdate.strftime("%Y%m%d")+'-'+edate.strftime("%Y%m%d")+'_geotool_stack_plot.jpg') 
+            plt.savefig(sdate.strftime("%Y%m%d")+'-'+edate.strftime("%Y%m%d")+'_geotool_stack_plot.png') 
     return fig        
 #sdate=datetime.datetime(2018,1,1)
 #edate=datetime.datetime(2018,1,2)
