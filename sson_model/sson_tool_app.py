@@ -5,7 +5,6 @@ sys.path.append("../")
 import session_state
 import pandas
 import datetime
-import sys
 import pred_ss_onset
 import extract_rt_al
 

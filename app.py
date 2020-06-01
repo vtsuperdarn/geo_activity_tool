@@ -88,10 +88,10 @@ def fac_model_page():
     """
     FAC model page
     """
-    tmp_plchldr_txt = st.empty()
-    tmp_plchldr_spin = st.empty()
-    tmp_plchldr_txt.subheader("Under development. Come back later...")
-    tmp_plchldr_spin.image("misc/brewing2.gif")
+    import sys
+    sys.path.append("./amp_model/")
+    from amp_tool_app import real_time_amp_preds
+    real_time_amp_preds()
     
 def ss_onset_page(state):
     """
