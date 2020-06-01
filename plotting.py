@@ -272,7 +272,7 @@ def fetch_data_plotting(sdate,edate,plot_style="classic",
         axes[0].set_title(sdate.strftime("%m/%d/%Y")+'-'+edate.strftime("%m/%d/%Y"),fontsize=14)
         if save_fig:
             plt.savefig(sdate.strftime("%Y%m%d")+'-'+edate.strftime("%Y%m%d")+'_geotool_stack_plot.jpg') 
-            
+    return fig        
 #sdate=datetime.datetime(2018,1,1)
 #edate=datetime.datetime(2018,1,2)
 #fig = fetch_data_plotting(sdate,edate,plot_style="classic",\
