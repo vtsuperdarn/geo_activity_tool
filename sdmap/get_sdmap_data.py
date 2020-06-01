@@ -29,8 +29,8 @@ class DownloadSDMap(object):
         self.ftype = ftype
         self.hemi = hemi
         
-    def store_map_data(self, db_name="gme_data",\
-                        table_name="sd_map",\
+    def store_map_data(self, db_name="gme_data",
+                        table_name="sd_map",
                         local_data_store="../data/sqlite3/"):
         """
         Download AUR inds data and store in a db
@@ -39,7 +39,7 @@ class DownloadSDMap(object):
         # fetch the data
         data_df = self.fetch_map_data()
         # set up the database connections!
-        db_obj = DbUtils(db_name=db_name,\
+        db_obj = DbUtils(db_name=db_name,
                      local_data_store=local_data_store)
         if data_df is not None:
             print("Working with map data from VT server!")
@@ -75,21 +75,21 @@ class DownloadSDMap(object):
         cpcps = []
         HMB_mlat_min = []
            
-        date1 = date(self.date_range[1].year,self.date_range[1].month,\
+        date1 = date(self.date_range[1].year,self.date_range[1].month,
                      self.date_range[1].day)
-        date0 = date(self.date_range[0].year,self.date_range[0].month,\
+        date0 = date(self.date_range[0].year,self.date_range[0].month,
                      self.date_range[0].day)
         num_days = (date1-date0).days
         dates = [self.date_range[0]+timedelta(days=ii) for ii in range(num_days)]
         for date in dates: 
             local_map_dir="/sd-data/"+str(date.year)+"/"+self.ftype+"/"+self.hemi+"/"
-            print(local_map_dir)
+            #print(local_map_dir)
             fnamefmt=date.strftime("%Y%m%d")+"."+self.hemi+"."+self.ftype+".bz2"
             print(fnamefmt)
             map2_files.append(local_map_dir+fnamefmt)
             
         if len(map2_files) == 0:
-            pring('No '+ftype+' file in the '+hemi+'ern hemisphere was found!')
+            print('No '+self.ftype+' file in the '+self.hemi+'ern hemisphere was found!')
             return
         else:    
             print("Reading in map files")
@@ -98,16 +98,22 @@ class DownloadSDMap(object):
                 with bz2.open(file) as fp: 
                     map2_stream = fp.read()
                 # pyDARN functions to read a map file stream
-                reader = pydarn.SDarnRead(map2_stream, True)
-                map_data = reader.read_map()
+                reader = pydarn.SDarnRead(map2_stream, True)                
+                try:
+                    map_data = reader.read_map()
+                except pydarn.superdarn_exceptions.SuperDARNFieldMissingError as err:
+                    print(err)
+                    print(file+' data skipped due to missing field exception!')
+                    continue
+                #map_data = reader.read_map()
                 stids = []
                 nvecs = []
                 
                 for i in map_data:
                     cpcps.append(i['pot.drop'])
                     HMB_mlat_min.append(i['latmin'])
-                    dt_arr.append(datetime.datetime(i['start.year'],i['start.month'],\
-                                                    i['start.day'],i['start.hour'],\
+                    dt_arr.append(datetime.datetime(i['start.year'],i['start.month'],
+                                                    i['start.day'],i['start.hour'],
                                                     i['start.minute']))
                     stids.append(i['stid'])
                     nvecs.append(i['nvec'])
@@ -123,10 +129,10 @@ class DownloadSDMap(object):
                     Nvec_mid.append(tmp_Nvec_mid)
                     Nvec_high.append(tmp_Nvec_high)   
         print("Reading complete...")
-        d = {'date':dt_arr,'highlat_nvec':Nvec_high,'midlat_nvec':Nvec_mid,\
+        d = {'date':dt_arr,'highlat_nvec':Nvec_high,'midlat_nvec':Nvec_mid,
              'hm_bnd':HMB_mlat_min,'cpcp':cpcps}
         map_df = pandas.DataFrame(d)
-        map_df = map_df.astype({"highlat_nvec": "int16", "midlat_nvec": "int16",\
+        map_df = map_df.astype({"highlat_nvec": "int16", "midlat_nvec": "int16",
                                   "hm_bnd": "float16", "cpcp": "float32"})
         return map_df
 
@@ -134,8 +140,8 @@ class DownloadSDMap(object):
 if __name__ == "__main__":
     data_obj = DownloadSDMap(
                     date_range = [ 
-                                datetime.datetime(2017,12,31),
-                                datetime.datetime(2018,1,2),
+                                datetime.datetime(2017,1,1),
+                                datetime.datetime(2019,1,1),
                                ]
                         )
     #data_df = data_obj.fetch_map_data()
