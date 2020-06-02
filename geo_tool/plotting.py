@@ -263,7 +263,7 @@ def fetch_data_plotting(sdate,edate,plot_style="classic",
         axes[ind].yaxis.set_major_locator(plt.MaxNLocator(Mnbins))
         axes[ind].set_ylabel('CPCP\n[keV]',fontsize=14)
         
-    axes[ind].set_xlabel('Time',fontsize=14)  
+    axes[nrows-1].set_xlabel('Time',fontsize=14)  
     axes[nrows-1].xaxis.set_major_formatter(myFmt)    
         
     if sdate.strftime("%m/%d/%Y") == edate.strftime("%m/%d/%Y"):
