@@ -16,6 +16,13 @@ def real_time_amp_preds():
                         model_name="3f8579fa_20190921-13:37:19")
     tmp_plchldr_txt.empty()
     tmp_plchldr_spin.empty()
+    # side bar notes
+    st.sidebar.markdown("### What are Field aligned currents (FACs)?")
+    st.sidebar.markdown("FACs or Birkeland currents are a set of currents flowing along the geomagnetic field lines, coupling the solar wind to the Earth's magnetosphere and the ionosphere. These currents are an important means through which solar wind energy is transferred to the Earth's upper atmosphere.")
+    st.sidebar.markdown("### What are these forecasts?")
+    st.sidebar.markdown("These are forecasts of FACs made using realtime solar wind and IMF data obtained from the DSCOVR satellite positioned at the L1 Lagrangian point.")
+    st.sidebar.markdown("### How are these forecasts made?")
+    st.sidebar.markdown("The forecasts are made using a Convolutional Neural Network (CNN) which uses a 1-hour history of IMF and solar wind conditions as inputs to generate global maps of FACs. The unique feature of the CNN model is its capability to make accurate predictions under variable solar wind and IMF conditions.")
     # AMPERE plots!
     st.header("Field aligned current forecasts")
     st.pyplot(amp_plot)
