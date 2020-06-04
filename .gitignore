@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 data/
+gps_tec/data
 
 # C extensions
 *.so
