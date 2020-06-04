@@ -25,7 +25,7 @@ class PredSSON(object):
     """
     def __init__(self, model_name="model_paper",\
                  epoch=200, omn_pred_hist=120,\
-                local_data_folder="data/"):
+                local_data_folder="sson_model/data/"):
         """
         Load the SW/IMF data and the mean input parameters
         used during training!
@@ -35,8 +35,10 @@ class PredSSON(object):
         # folder to store the data/predictions
         # this will be used so that we don't repeat
         # calculations
+        import os
+        local_data_folder = pathlib.Path.cwd().joinpath(local_data_folder)
         if pathlib.Path(local_data_folder).exists():
-            self.local_data_folder = local_data_folder
+            self.local_data_folder = local_data_folder.as_posix() + "/"
         else:
             self.local_data_folder = pathlib.Path.cwd().parent.joinpath(local_data_folder)
             self.local_data_folder = self.local_data_folder.as_posix() + "/"

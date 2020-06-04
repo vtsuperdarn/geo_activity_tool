@@ -11,9 +11,10 @@ class DwnldRTSW(object):
         initialize the vars
         """
         import pathlib
+        local_file = pathlib.Path.cwd().joinpath(local_file)
         self.file_url = "https://services.swpc.noaa.gov/products/geospace/propagated-solar-wind.json"
         if pathlib.Path(local_file).exists():
-            self.local_file = local_file
+            self.local_file = local_file.as_posix() + "/"
         else:
             self.local_file = pathlib.Path.cwd().parent.joinpath(local_file)
             self.local_file = self.local_file.as_posix() + "/"
