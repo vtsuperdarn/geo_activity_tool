@@ -34,17 +34,17 @@ def main():
     # session state details for the geo_activity_tool page
     # session state details for the sson_model page
     # session state details for the sson_model page
-    data_obj = dwnld_sw_imf_rt.DwnldRTSW()
-    url_data = data_obj.dwnld_file()
-    if url_data is not None:
-        data_obj.read_url_data(url_data)
+    #data_obj = dwnld_sw_imf_rt.DwnldRTSW()
+    #url_data = data_obj.dwnld_file()
+    #if url_data is not None:
+    #    data_obj.read_url_data(url_data)
     # repeat the operations we do with sson_model calc
-    sw_imf_df = data_obj.read_stored_data()
-    sw_imf_df.set_index('propagated_time_tag', inplace=True)
-    sw_imf_df = sw_imf_df.resample('1min').median()
+    #sw_imf_df = data_obj.read_stored_data()
+    #sw_imf_df.set_index('propagated_time_tag', inplace=True)
+    #sw_imf_df = sw_imf_df.resample('1min').median()
     # linearly interpolate data
-    sw_imf_df.interpolate(method='linear', axis=0, inplace=True)
-    omn_end_time = sw_imf_df.index.max()
+    #sw_imf_df.interpolate(method='linear', axis=0, inplace=True)
+    #omn_end_time = sw_imf_df.index.max()
     # session state details for the sson_model page
     # session state details for the sson_model page
     # common session state details for the all pages
@@ -54,7 +54,7 @@ def main():
                             plot_param_list=geo_all_param_list,\
                             plot_nhours_plot=nhours_plot_default,\
                             plot_ndays_plot=ndays_plot_default,\
-                            date_sson_hist_plot=omn_end_time
+                            date_sson_hist_plot=datetime.datetime.utcnow()
                             )
     
     if model_option == 'Daily geoactivity tool':
@@ -79,10 +79,10 @@ def gps_tec_page():
     """
     GPS TEC page
     """
-    tmp_plchldr_txt = st.empty()
-    tmp_plchldr_spin = st.empty()
-    tmp_plchldr_txt.subheader("Under development. Come back later...")
-    tmp_plchldr_spin.image("misc/brewing2.gif")
+    import sys
+    sys.path.append("./gps_tec/")
+    from TECapp import tec_webtool 
+    tec_webtool()
     
 def fac_model_page():
     """
