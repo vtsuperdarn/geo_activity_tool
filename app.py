@@ -79,10 +79,10 @@ def gps_tec_page():
     """
     GPS TEC page
     """
-    tmp_plchldr_txt = st.empty()
-    tmp_plchldr_spin = st.empty()
-    tmp_plchldr_txt.subheader("Under development. Come back later...")
-    tmp_plchldr_spin.image("misc/brewing2.gif")
+    import sys
+    sys.path.append("./gps_tec/")
+    from TECapp import tec_webtool 
+    tec_webtool()
     
 def fac_model_page():
     """
