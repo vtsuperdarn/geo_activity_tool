@@ -21,7 +21,7 @@ def tec_webtool():
     if function == 'Interactive Plotter':
         st.title('Total Electron Content Interactive Plotting Tool')
         time = st.sidebar.time_input('Time (UT)', datetime.time(12, 0))
-        coordsystem = st.sidebar.selectbox('Coordinate System', ('Geographic', 'AACGMv2', 'IGRF'))
+        coordsystem = st.sidebar.selectbox('Coordinate System', ('Geographic', 'AACGMv2'))
         supermag = st.sidebar.checkbox('Overlay magnetometers?')
         maxtec = st.sidebar.slider('Max TEC Value to Plot, (TECU)', 0, 50, 20)
         st.sidebar.markdown('TEC units are vertical column density measurments.')
@@ -183,7 +183,7 @@ def plot(lat, lon, Z, date, time, intfactor, maxtec, coordsystem, plottype, exte
         if map_proj == ccrs.PlateCarree():
             mesh = ax.pcolor(lon, lat, Z, cmap='jet', vmax=maxtec, transform=ccrs.PlateCarree()) 
         else:
-            mesh = ax.scatter(lon, lat, c=Z, cmap='jet', vmax=maxtec, transform=ccrs.PlateCarree())
+            mesh = ax.scatter(lon, lat, c=Z, cmap='jet', vmax=maxtec, transform=ccrs.PlateCarree(), edgecolor='none')
     
     else:
         #usepcolormesh in 
