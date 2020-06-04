@@ -62,12 +62,12 @@ def getextent(plottype):
 
 def showdailyplots(date):
 
-   st.image('./gps_tec/' + str(date.year) + "/" + str(date.month) + "/" + str(date.day) + '/merged_images.png')
+   st.image('./gps_tec/data/' + str(date.year) + "/" + str(date.month) + "/" + str(date.day) + '/merged_images.png')
 
 
 def showmovie(date):
 
-    st.image('./gps_tec/' + str(date.year) + "/" + str(date.month) + "/" + str(date.day) + '/movie.gif')
+    st.image('./gps_tec/data/' + str(date.year) + "/" + str(date.month) + "/" + str(date.day) + '/movie.gif')
 
     
 def timeconvert(time):
@@ -105,7 +105,7 @@ def geotomag(lat,lon,alt,plot_date):
 
 def convert(date, time, intfactor, coordsystem, medfilter):
     directory = str(os.getcwd()) 
-    directory = directory + '/gps_tec/' + str(date.year) + '/' + str(date.month) + '/' + str(date.day)
+    directory = directory + '/gps_tec/data/' + str(date.year) + '/' + str(date.month) + '/' + str(date.day)
     with np.load(directory + '/data.npz') as data:
         tec = data['tec']        
         timeint = timeconvert(time)        
@@ -203,6 +203,10 @@ def plot(lat, lon, Z, date, time, intfactor, maxtec, coordsystem, plottype, exte
     ax.gridlines(linewidth=0.5)
     plt.title('Total Electron Content for ' + str(date.month) + '/' + str(date.day) + '/' + str(date.year) + ' at ' + str(time.hour) + ':' + ('%02d' % time.minute) + ' UT')
     st.pyplot(tecmap)
+
+
+
+    
 
 
 
