@@ -51,13 +51,15 @@ class DbUtils(object):
         self.conn.close()
         return
 
-    def map_to_db(self, map_df, table_name="sd_map", chunksize=3600, if_exists="replace"):
+    def map_to_db(self, map_df, table_name="sd_map"):
         """
         Write the dataframe with SuperDARN map data into the db.
         Parameters
         ----------
         map_df : pandas dataframe with SuperDAN map data
         """
+
+        # create table if it doesn't exist
         sql_create_map_table = """
                                     CREATE TABLE IF NOT EXISTS {tb} (
                                     date TIMESTAMP PRIMARY KEY,
@@ -72,9 +74,18 @@ class DbUtils(object):
             self.conn.cursor().execute(command)
         else:
             print("Error! cannot create the db connection!")
-        map_df.to_sql(table_name, con=self.conn, if_exists=if_exists, chunksize=chunksize)
-        self._commit_tx()
-        return
+        # populate the table
+        cols = "date, highlat_nvec, midlat_nvec, hm_bnd, cpcp"
+        for _nrow, _row in map_df.iterrows():
+            command = "INSERT OR REPLACE INTO {tb}({cols}) VALUES (?, ?, ?, ?, ?)".\
+                      format(tb=table_name, cols=cols)
+            self.conn.cursor().execute(\
+                        command,\
+                         (_row["date"].to_pydatetime(), _row["highlat_nvec"], _row["midlat_nvec"], _row["hm_bnd"], _row["cpcp"])\
+                         )
+        self.conn.commit()
+        # close db connection
+        self.conn.close()
 
     def dscovr_to_db(self, dscovr_df, table_name="dscovr", chunksize=3600, if_exists="replace"):
         """
