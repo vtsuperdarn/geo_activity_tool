@@ -45,8 +45,6 @@ class DownloadSDMap(object):
             print("Working with map data from VT server!")
             db_obj.map_to_db(data_df, table_name=table_name)
             print("Updated DB!")
-        db_obj._close_dbconn()
-        return
         
 
     def fetch_map_data(self):
