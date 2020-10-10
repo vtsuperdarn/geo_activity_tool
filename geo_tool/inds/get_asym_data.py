@@ -122,8 +122,8 @@ class DownloadAsym(object):
 if __name__ == "__main__":
     data_obj = DownloadAsym(
                     date_range = [ 
-                                datetime.datetime(2016,1,1),
                                 datetime.datetime(2017,1,1),
+                                datetime.datetime(2019,1,1),
                                ]
                         )
 #     data_df, missing_dates = data_obj.get_asym_data()

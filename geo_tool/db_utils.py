@@ -13,7 +13,7 @@ class DbUtils(object):
     MOdified By - Xueling Shi (05/2020)
     """
     def __init__(self, db_name="gme_data",\
-                 local_data_store="data/sqlite3/"):
+                 local_data_store="../data/sqlite3/"):
         """
         Initialize some vars for settings
 
