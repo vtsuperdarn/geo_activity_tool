@@ -123,8 +123,8 @@ class DownloadAsym(object):
 if __name__ == "__main__":
     data_obj = DownloadAsym(
                     date_range = [ 
-                                datetime.datetime(2019,1,1),
-                                datetime.datetime(2021,1,1),
+                                datetime.datetime(2016,1,1),
+                                datetime.datetime(2021,2,1),
                                ]
                         )
 #     data_df, missing_dates = data_obj.get_asym_data()
@@ -132,5 +132,5 @@ if __name__ == "__main__":
 #         print(data_df.tail())
 #     print("----------------")
 #     print(missing_dates)
-    data_obj.fetch_store_aur_data()
+    data_obj.fetch_store_aur_data(local_data_store="../../data/sqlite3/")
 

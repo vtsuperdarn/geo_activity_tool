@@ -218,7 +218,7 @@ def execute(start, end, v):
             (sym_storm_hour["pred_2cyc"] <= crngtn_dates[-1].date()) ]
     print(" Aggrigate storm hours:")
     print(sym_storm_hour.head())
-    fname = "data/crngtn_" + str(start.year) + ".png"
+    fname = "data/crngtn_" + str(start.year) + ".pdf"
     plot_data(sym_agg, sym_storms_df, sym_storm_hour, crngtn_dates, crngtn_cycle_num, fname)
     return
 
