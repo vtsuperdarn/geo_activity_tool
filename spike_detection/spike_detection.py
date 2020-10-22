@@ -42,7 +42,7 @@ def fetch_symh():
     return
 
 def parse_data():
-    parse_data = False
+    parse_data = True
     if parse_data: fetch_symh()
     with open("symh.txt") as f:
         h = None

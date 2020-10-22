@@ -8,6 +8,9 @@ gps_tec/data
 # C extensions
 *.so
 
+spike_detection/*.csv
+spike_detection/*.png
+spike_detection/*.txt
 # Distribution / packaging
 .Python
 build/
