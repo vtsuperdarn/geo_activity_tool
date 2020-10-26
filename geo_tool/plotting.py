@@ -261,7 +261,7 @@ def fetch_data_plotting(sdate,edate,plot_style="classic",
         axes[ind].plot(dt_arr,numpy.array(cpcps)/1000.,'k') 
         axes[ind].set(xlim=xlim,ylim=[0,100])
         axes[ind].yaxis.set_major_locator(plt.MaxNLocator(Mnbins))
-        axes[ind].set_ylabel('CPCP\n[keV]',fontsize=14)
+        axes[ind].set_ylabel('CPCP\n[kV]',fontsize=14)
         
     axes[nrows-1].set_xlabel('Time',fontsize=14)  
     axes[nrows-1].xaxis.set_major_formatter(myFmt)    
